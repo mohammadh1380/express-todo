@@ -1,17 +1,28 @@
-require('dotenv').config();
+const fs        = require("fs");
+const path      = require("path");
+const Sequelize = require("sequelize");
+const basename  = path.basename(module.filename);
+const env       = process.env.NODE_ENV || "development";
+const config    = require('../config/config.js')[env];
+const sequelize = new Sequelize(config.database, config.username, config.password, config);
+const db        = {};
 
-const { Sequelize, DataTypes } = require('sequelize')
+fs.readdirSync(__dirname)
+    .filter(function(file) {
+        return (file.indexOf(".") !== 0) && (file !== basename);
+    })
+    .forEach(function(file) {
+        const model = sequelize["import"](path.join(__dirname, file));
+        db[model.name] = model;
+    });
 
-const sequelize = new Sequelize(process.env.DB_NAME, process.env.DB_USER, process.env.DB_PASS,{
-    host: process.env.DB_HOST,
-    dialect: 'postgres'
+Object.keys(db).forEach(function(modelName) {
+    if ("associate" in db[modelName]) {
+        db[modelName].associate(db);
+    }
 });
 
-const User = require('../models/account/userModel')(sequelize, DataTypes)
+db.sequelize = sequelize;
+db.Sequelize = Sequelize;
 
-
-
-User.findAll().then((user) => {
-    console.log(user)
-})
-
+module.exports = db;

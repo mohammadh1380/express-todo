@@ -6,3 +6,5 @@ test.http
 .env
 
 package-lock.json
+
+src/models/index.js

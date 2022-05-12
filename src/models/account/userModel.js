@@ -1,6 +1,6 @@
 const bcrypt = require("bcrypt");
 module.exports = (sequelize, DataTypes) => {
-    const user = sequelize.define(
+    const User = sequelize.define(
         'user',
         {
             id: {
@@ -10,10 +10,12 @@ module.exports = (sequelize, DataTypes) => {
             },
             username: {
                 type: DataTypes.STRING,
+                allowNull: false,
                 unique: true,
             },
             password: {
                 type: DataTypes.STRING,
+                allowNull: false,
             },
         },
         {
@@ -26,13 +28,17 @@ module.exports = (sequelize, DataTypes) => {
                 }
             },
             instanceMethods: {
-                validPassword: function(password) {
+                validPassword: function (password) {
                     return bcrypt.compareSync(password, this.password);
+                }
+            }
+        }, {
+            classMethods: {
+                associate: function (models) {
+                    User.hasMany(models.Task)
                 }
             }
         }
     );
-
-    user.sync();
-    return user;
+    return User;
 };
