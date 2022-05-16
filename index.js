@@ -1,15 +1,13 @@
-express = require('express')
+import express from 'express';
+const app = express()
+import dotenv from "dotenv";
+import models, {sequelize} from "./src/models/index.js";
+dotenv.config()
 
-app = express()
-require("dotenv").config();
-port = 3000
-
-// app.get('/',(req, res) => {
-//     res.send("Hello")
-// })
-//
-//
-// app.listen(port, () => {
-//     console.log("Ok!!!")
-// })
-console.log(process.env.DB_PASS)
+sequelize.sync().then(async () => {
+    const user = await models.User.create({username: "hamed", password: "password"})
+    await user.save()
+    app.listen(process.env.PORT, () => {
+        console.log(`Example app listening on port ${process.env.PORT}!`);
+    });
+});

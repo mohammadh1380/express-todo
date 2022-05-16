@@ -1,5 +1,5 @@
-const bcrypt = require("bcrypt");
-module.exports = (sequelize, DataTypes) => {
+import bcrypt from "bcrypt";
+const UserModel = (sequelize, DataTypes) => {
     const User = sequelize.define(
         'user',
         {
@@ -32,13 +32,13 @@ module.exports = (sequelize, DataTypes) => {
                     return bcrypt.compareSync(password, this.password);
                 }
             }
-        }, {
-            classMethods: {
-                associate: function (models) {
-                    User.hasMany(models.Task)
-                }
-            }
-        }
+        },
     );
+
+    User.associate = (models) => {
+        User.hasMany(models.Task);
+    };
     return User;
 };
+
+export default UserModel;

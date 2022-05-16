@@ -1,5 +1,4 @@
-const user = require('../account/userModel')
-module.exports = function(sequelize, DataTypes) {
+const TaskModel = function(sequelize, DataTypes) {
     const Task = sequelize.define(
         'task',
         {
@@ -12,13 +11,14 @@ module.exports = function(sequelize, DataTypes) {
                 allowNull: false,
                 defaultValue: false
             }
-        }, {
-            classMethods: {
-                associate: function(models) {
-                    Task.belongsTo(models.belongsTo(models.Us));
-                }
-        }
-    });
+        },
+    );
+
+    Task.associate = (models) => {
+        Task.belongsTo(models.User);
+    };
 
     return Task;
 }
+
+export default TaskModel;

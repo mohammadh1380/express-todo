@@ -1,28 +1,29 @@
-const fs        = require("fs");
-const path      = require("path");
-const Sequelize = require("sequelize");
-const basename  = path.basename(module.filename);
-const env       = process.env.NODE_ENV || "development";
-const config    = require('../config/config.js')[env];
-const sequelize = new Sequelize(config.database, config.username, config.password, config);
-const db        = {};
+import {Sequelize} from "sequelize";
+import dotenv from "dotenv";
+import user from './account/userModel.js';
+import task from './todo/task-model.js';
+dotenv.config();
+const sequelize = new Sequelize(
+    process.env.DB_NAME,
+    process.env.DB_USER,
+    process.env.DB_PASS,
+    {
+        dialect: 'postgres',
+    },
+);
 
-fs.readdirSync(__dirname)
-    .filter(function(file) {
-        return (file.indexOf(".") !== 0) && (file !== basename);
-    })
-    .forEach(function(file) {
-        const model = sequelize["import"](path.join(__dirname, file));
-        db[model.name] = model;
-    });
+const models = {
+    User: user(sequelize, Sequelize),
+    Task: task(sequelize, Sequelize),
+};
 
-Object.keys(db).forEach(function(modelName) {
-    if ("associate" in db[modelName]) {
-        db[modelName].associate(db);
+Object.keys(models).forEach((key) => {
+    if ('associate' in models[key]) {
+        models[key].associate(models);
     }
 });
 
-db.sequelize = sequelize;
-db.Sequelize = Sequelize;
+export { sequelize };
 
-module.exports = db;
+export default models;
+
